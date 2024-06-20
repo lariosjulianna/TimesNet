@@ -80,7 +80,7 @@ class Dataset_BTD(Dataset):
         else:
             data = df_data.values
 
-
+        #### fix!!!
         # df_stamp = df_raw[['date']][border1:border2]
         # df_stamp['date'] = pd.to_datetime(df_stamp.date)
         # if self.timeenc == 0:
@@ -92,6 +92,7 @@ class Dataset_BTD(Dataset):
         # elif self.timeenc == 1:
         #     data_stamp = time_features(pd.to_datetime(df_stamp['frame_id'].values), freq=self.freq)
         #     data_stamp = data_stamp.transpose(1, 0) 
+        ##########3 fix !!!!!
 
         # if self.features == 'M' or self.features == 'MS':
         #     cols_data = df_raw.columns[1:]
