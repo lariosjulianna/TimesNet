@@ -1,17 +1,17 @@
 # TimesNet
 Unfinished
 
-Clone repo and run all cells in times_net.ipynb
+Clone repo
 
 in terminal, run
 
-model_name=TimesNet python -u run.py \
+model_name=times_net python -u run.py \
 --task_name short_term_forecast \
 --is_training 1 \
 --root_path ./dataset/ \
 --data_path BTD.txt \
 --model_id BTD_96_96 \
---model TimesNet \
+--model times_net \
 --data BTD \
 --features M \
 --seq_len 96 \
@@ -20,9 +20,9 @@ model_name=TimesNet python -u run.py \
 --e_layers 2 \
 --d_layers 1 \
 --factor 3 \
---enc_in 6 \
---dec_in 6 \
---c_out 6 \
+--enc_in 5 \
+--dec_in 5 \
+--c_out 5 \
 --d_model 16 \
 --d_ff 32 \
 --des 'Exp' \
