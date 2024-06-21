@@ -21,12 +21,26 @@ class Exp_Short_Term_Forecast(Exp_Basic):
         super(Exp_Short_Term_Forecast, self).__init__(args)
 
     def _build_model(self):
-        if self.args.data == 'm4':
-            self.args.pred_len = M4Meta.horizons_map[self.args.seasonal_patterns]  # Up to M4 config
-            self.args.seq_len = 2 * self.args.pred_len  # input_len = 2*pred_len
-            self.args.label_len = self.args.pred_len
-            self.args.frequency_map = M4Meta.frequency_map[self.args.seasonal_patterns]
-        model = self.model_dict[self.args.model].Model(self.args).float()
+        # if self.args.data == 'BTD':
+        #     self.args.pred_len = M4Meta.horizons_map[self.args.seasonal_patterns]  # Up to M4 config
+        #     self.args.seq_len = 2 * self.args.pred_len  # input_len = 2*pred_len
+        #     self.args.label_len = self.args.pred_len
+        #     self.args.frequency_map = M4Meta.frequency_map[self.args.seasonal_patterns]
+        # model = self.model_dict[self.args.model].Model(self.args).float()
+        model_args = {
+            'seq_len': self.args.seq_len,
+            'label_len': self.args.label_len,
+            'pred_len': self.args.pred_len,
+            'num_encoder_layers': self.args.e_layers,
+            'top_k': self.args.top_k,
+            'd_model': self.args.d_model,
+            'enc_in': self.args.enc_in,
+            'embed': self.args.embed,
+            'freq': self.args.freq,
+            'dropout': self.args.dropout,
+            'c_out': self.args.c_out
+        }
+        model = self.model_dict[self.args.model].Model(**model_args).float()
 
         if self.args.use_multi_gpu and self.args.use_gpu:
             model = nn.DataParallel(model, device_ids=self.args.device_ids)
@@ -86,6 +100,7 @@ class Exp_Short_Term_Forecast(Exp_Basic):
                 dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
 
                 outputs = self.model(batch_x, None, dec_inp, None)
+                #outputs = self.model(batch_x, dec_inp)
 
                 f_dim = -1 if self.args.features == 'MS' else 0
                 outputs = outputs[:, -self.args.pred_len:, f_dim:]

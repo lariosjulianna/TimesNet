@@ -1,15 +1,16 @@
 import os
 import torch
-#from models import Autoformer, Transformer, TimesNet, Nonstationary_Transformer, DLinear, FEDformer, \
+#from models import Autoformer, Transformer, TimesNet, times_net, Nonstationary_Transformer, DLinear, FEDformer, \
 #    Informer, LightTS, Reformer, ETSformer, Pyraformer, PatchTST, MICN, Crossformer, FiLM, iTransformer, \
 #    Koopa, TiDE, FreTS, TimeMixer, TSMixer, SegRNN, MambaSimple, Mamba, TemporalFusionTransformer
-from models import TimesNet
+from models import times_net
 
 class Exp_Basic(object):
     def __init__(self, args):
         self.args = args
         self.model_dict = {
-            'TimesNet': TimesNet,
+            #'TimesNet': TimesNet,
+            'times_net': times_net,
             # 'Autoformer': Autoformer,
             # 'Transformer': Transformer,
             # 'Nonstationary_Transformer': Nonstationary_Transformer,
