@@ -158,7 +158,7 @@ def data_provider(args, flag):
         )
         return data_set, data_loader
     else:
-        if args.data == 'short-term-forecasting':
+        if args.data == 'm4':
             drop_last = False
         data_set = Data(
             #args = args,
