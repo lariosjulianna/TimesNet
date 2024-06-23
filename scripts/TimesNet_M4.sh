@@ -1,15 +1,15 @@
 export CUDA_VISIBLE_DEVICES=1
 
-model_name=TimesNet
+model_name=times_net
 
 python -u run.py \
   --task_name short_term_forecast \
   --is_training 1 \
-  --root_path ./dataset/m4 \
-  --seasonal_patterns 'Monthly' \
-  --model_id m4_Monthly \
+  --root_path ./dataset/BTD \
+  --seasonal_patterns 'Hourly' \
+  --model_id BTD_Hourly \
   --model $model_name \
-  --data m4 \
+  --data BTD \
   --features M \
   --e_layers 2 \
   --d_layers 1 \

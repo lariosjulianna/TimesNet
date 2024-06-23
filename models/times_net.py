@@ -232,7 +232,7 @@ class Model(nn.Module):
         self.seq_len = seq_len
         self.label_len = label_len
         self.pred_len = pred_len
-        self.model = nn.ModuleList([TimesBlock(seq_len, pred_len, top_k, d_model, d_ff=32, num_kernels=6)
+        self.model = nn.ModuleList([TimesBlock(seq_len, label_len, pred_len, top_k, d_model, d_ff=32, num_kernels=6)
                                     for _ in range(num_encoder_layers)])
         self.enc_embedding = DataEmbedding(enc_in, d_model, embed, freq, dropout)
         self.layer = num_encoder_layers

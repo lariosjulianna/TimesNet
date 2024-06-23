@@ -52,20 +52,20 @@ class Dataset_BTD(Dataset):
         self.__read_data__()
 
 
-        #self.augmentation_ratio = augmentation_ratio
+        self.augmentation_ratio = augmentation_ratio
 
     def __read_data__(self):
         self.scaler = StandardScaler()
-        df_raw = pd.read_csv(os.path.join(self.root_path, self.data_path)) # Read CSV without header
+        df_raw = pd.read_csv(os.path.join(self.root_path, self.data_path)) 
         print(df_raw.columns)
 
         border1s = [0, 12 * 30 * 24 - self.seq_len, 12 * 30 * 24 + 4 * 30 * 24 - self.seq_len]
         border2s = [12 * 30 * 24, 12 * 30 * 24 + 4 * 30 * 24, 12 * 30 * 24 + 8 * 30 * 24]
-        # border1 = border1s[0]
-        # border2 = border2s[0]
-        # [self.set_type]
-        border1 = border1s[self.set_type]
-        border2 = border2s[self.set_type]
+        border1 = border1s[0]
+        border2 = border2s[0]
+        #[self.set_type]
+        # border1 = border1s[self.set_type]
+        # border2 = border2s[self.set_type]
 
         if self.features == 'M' or self.features == 'MS':
             cols_data = df_raw.columns[1:]
@@ -80,51 +80,45 @@ class Dataset_BTD(Dataset):
         else:
             data = df_data.values
 
-        #### fix!!!
-        # df_stamp = df_raw[['date']][border1:border2]
-        # df_stamp['date'] = pd.to_datetime(df_stamp.date)
-        # if self.timeenc == 0:
-        #     df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-        #     df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-        #     df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-        #     df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
-        #     data_stamp = df_stamp.drop(['frame_id'], 1).values
-        # elif self.timeenc == 1:
-        #     data_stamp = time_features(pd.to_datetime(df_stamp['frame_id'].values), freq=self.freq)
-        #     data_stamp = data_stamp.transpose(1, 0) 
-        ##########3 fix !!!!!
+        df_stamp = df_raw[['frame_id']][border1:border2]
+        # df_stamp['frame_id'] = pd.to_datetime(df_stamp.frame_id), format='%Y-%m-%d %H:%M:%S.%f')
+        df_stamp['frame_id'] = pd.to_datetime(df_stamp['frame_id'], format='%Y-%m-%d %H:%M:%S.%f')
+        #print(df_stamp)
+        if self.timeenc == 0:
+            #df_stamp['second'] = df_stamp.frame_id.apply(lambda row: row.second, 1)
+            #df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
+            #df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
+            # df_stamp['frame_id'] = df_stamp.frame_id.apply(lambda row: row.second, 1)
+            # data_stamp = df_stamp.drop(['frame_id'], 1).values
+            df_stamp['time_interval'] = (df_stamp['frame_id'].dt.microsecond // 100000)  # 0.1 seconds interval
+            # df_stamp['month'] = df_stamp['frame_id'].dt.month
+            # df_stamp['day'] = df_stamp['frame_id'].dt.day
+            # df_stamp['weekday'] = df_stamp['frame_id'].dt.weekday
+            # df_stamp['hour'] = df_stamp['frame_id'].dt.hour
+            df_stamp['minute'] = df_stamp['frame_id'].dt.minute // 15  # 15-minute intervals
+            
+            data_stamp = df_stamp.drop(['frame_id'], axis=1).values
 
-        # if self.features == 'M' or self.features == 'MS':
-        #     cols_data = df_raw.columns[1:]
-        #     df_data = df_raw[cols_data]
-        # elif self.features == 'S':
-        #     df_data = df_raw[[self.target]]
 
-        # if self.scale:
-        #     train_data = df_data[border1s[0]:border2s[0]]
-        #     self.scaler.fit(train_data.values)
-        #     data = self.scaler.transform(df_data.values)
-        # else:
-        #     data = df_data.values
-        # df_stamp = df_raw[['date']][border1:border2]
-        # df_stamp['frame_id'] = pd.to_datetime(df_stamp.date)
-        # if self.timeenc == 0:
-        #     df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-        #     df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-        #     df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-        #     df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
-        #     data_stamp = df_stamp.drop(['frame_id'], 1).values
-        # elif self.timeenc == 1:
-        #     data_stamp = time_features(pd.to_datetime(df_stamp['frame_id'].values), freq=self.freq)
-        #     data_stamp = data_stamp.transpose(1, 0)  
 
+            # df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
+            # df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
+            # df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
+            # df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
+            # df_stamp['minute'] = df_stamp.date.apply(lambda row: row.minute, 1)
+            # df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
+            # data_stamp = df_stamp.drop(['date'], 1).values
+        elif self.timeenc == 1:
+            data_stamp = time_features(pd.to_datetime(df_stamp['frame_id'].values), freq=self.freq)
+            data_stamp = data_stamp.transpose(1,0) 
+            print("new 0")
+            print(df_stamp)
+            print("new1")
+            print(data_stamp)
+
+    
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
-
-        # if self.set_type == 0 and self.args.augmentation_ratio > 0:
-        #     self.data_x, self.data_y, augmentation_tags = run_augmentation_single(self.data_x, self.data_y, self.args)
-            
-        # self.data_stamp = data_stamp
 
     def __getitem__(self, index):
         s_begin = index
@@ -137,9 +131,9 @@ class Dataset_BTD(Dataset):
         # seq_x_mark = self.data_stamp[s_begin:s_end]
         # seq_y_mark = self.data_stamp[r_begin:r_end]
 
-        # Generate a time-like representation based on index (sequence position)
-        seq_x_mark = np.arange(s_begin, s_end)[:, None]  # Example: Use sequence index as 'time'
-        seq_y_mark = np.arange(r_begin, r_end)[:, None]  # Example: Use sequence index as 'time'
+        # # Generate a time-like representation based on index (sequence position)
+        seq_x_mark = np.arange(s_begin, s_end)[:, None]  
+        seq_y_mark = np.arange(r_begin, r_end)[:, None] 
 
 
         return seq_x, seq_y, seq_x_mark, seq_y_mark
